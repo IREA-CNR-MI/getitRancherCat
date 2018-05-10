@@ -1,0 +1,424 @@
+version: "2"
+services:
+
+  db:
+    image: geonode/postgis:9.6
+    restart: unless-stopped
+    container_name: db4${COMPOSE_PROJECT_NAME}
+    stdin_open: true
+    tty: true
+    labels:
+        org.geonode.component: db
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+    volumes:
+      - dbdata:/var/lib/postgresql/data
+      - dbbackups:/pg_backups
+    environment:
+      - GEONODE_DATABASE=geonode
+      - GEONODE_DATABASE_PASSWORD=geonode
+      - GEONODE_GEODATABASE=geonode_data
+      - GEONODE_GEODATABASE_PASSWORD=geonode_data
+
+  dbsos:
+    image: geobeyond/dbsos-postgis:9.5
+    restart: unless-stopped
+    container_name: dbsos4${COMPOSE_PROJECT_NAME}
+    stdin_open: true
+    tty: true
+    labels:
+        org.geonode.component: dbsos
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+    volumes:
+      - dbsosdata:/dbsosdata
+    env_file:
+      - SERVICEPROVIDER_COUNTRY=Italy
+      - SERVICEPROVIDER_STATE=MI
+      - SERVICEPROVIDER_SITE=http://www.irea.cnr.it
+      - SERVICEPROVIDER_INDIVIDUALNAME=IREA CNR
+      - SERVICEPROVIDER_CITY=Milan
+      - SERVICEPROVIDER_INSTRUCTIONS=
+      - SERVICEPROVIDER_POSITIONNAME=TBA
+      - SERVICEPROVIDER_FAX=
+      - SERVICEPROVIDER_NODETITLE=GET-IT Demo
+      - SERVICEPROVIDER_HOURS=
+      - SERVICEPROVIDER_NODENAME=GET-IT Demo
+      - SERVICEPROVIDER_NODEABSTRACT=Sensor Observation Service - Access of observations
+      - SERVICEPROVIDER_ADDRESS=Via Alfonso Corti 12
+      - SERVICEPROVIDER_EMAIL=infogetitsk@gmail.com
+      - SERVICEPROVIDER_STATEPROVINCE=MI
+      - SERVICEPROVIDER_NAME=IREA CNR
+      - SERVICEPROVIDER_POSTALCODE=20133
+      - SERVICEPROVIDER_PHONE=
+      - SERVICEPROVIDER_NODEKEYWORDS=
+      - SERVICEIDENTIFICATION_ABSTRACT_IT=Sensor Observation Service - Accesso alle osservazioni
+      - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
+      - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
+      - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
+      - MISC_DEFAULTOFFERINGPREFIX=offering:
+      - INSPIRE_METADATA_URL=
+      - INSPIRE_NAMESPACE=
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
+      - TRANSACTIONAL_ALLOWED_PROXIES=
+      - TRANSACTIONAL_ALLOWED_IPS=
+      - SOS_ADMIN_USERNAME=adminsos
+      #- SOS_ADMIN_PASSWORD=adminsos
+      - GEONODE_LB_HOST_IP=demo.getit.com
+      - GEONODE_LB_PORT=80
+
+  elasticsearch:
+    image: elasticsearch
+    restart: unless-stopped
+    container_name: elasticsearch4${COMPOSE_PROJECT_NAME}
+    stdin_open: true
+    tty: true
+    labels:
+        org.geonode.component: elasticsearch
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+
+  rabbitmq:
+    image: rabbitmq
+    restart: unless-stopped
+    container_name: rabbitmq4${COMPOSE_PROJECT_NAME}
+    stdin_open: true
+    tty: true
+    labels:
+        org.geonode.component: rabbitmq
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+
+  django:
+    image: geobeyond/geonode:2.7.x
+    restart: unless-stopped
+    container_name: django4${COMPOSE_PROJECT_NAME}
+    stdin_open: true
+    tty: true
+    labels:
+        org.geonode.component: django
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+        io.rancher.container.pull_image: always
+    depends_on:
+      - db
+      - elasticsearch
+      - rabbitmq
+    command: django-admin.py runserver 0.0.0.0:8000 --settings=geonode.settings
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - GEONODE_INSTANCE_NAME=starterkit
+      - GEONODE_LB_HOST_IP=155.253.20.48
+      - GEONODE_LB_PORT=80
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - DEFAULT_BACKEND_DATASTORE=datastore
+      - GEONODE_DATABASE=geonode
+      - GEONODE_DATABASE_PASSWORD=geonode
+      - GEONODE_GEODATABASE=geonode_data
+      - GEONODE_GEODATABASE_PASSWORD=geonode_data
+      - BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - DJANGO_SETTINGS_MODULE=geosk.settings
+      - ALLOWED_HOSTS=['django',]
+      - DOCKER_ENV=production
+      - UWSGI_CMD=uwsgi --ini /usr/src/app/uwsgi.ini
+      - IS_CELERY=false
+      - C_FORCE_ROOT=1
+      - GEOSERVER_PUBLIC_LOCATION=http://geonode/geoserver/
+      - GEOSERVER_LOCATION=http://geonode/geoserver/
+      - SOS_LOCATION=http://geonode/observations/sos
+      - SITEURL=http://geonode/
+      - VERSION_UBUNTU=16.04
+      - VERSION_JAVA=1.8
+      - VERSION_TOMCAT=9
+      - VERSION_SOS=4.4
+      - SERVICEPROVIDER_COUNTRY=Italy
+      - SERVICEPROVIDER_STATE=MI
+      - SERVICEPROVIDER_SITE=http://www.irea.cnr.it
+      - SERVICEPROVIDER_INDIVIDUALNAME=IREA CNR
+      - SERVICEPROVIDER_CITY=Milan
+      - SERVICEPROVIDER_INSTRUCTIONS=
+      - SERVICEPROVIDER_POSITIONNAME=TBA
+      - SERVICEPROVIDER_FAX=
+      - SERVICEPROVIDER_NODETITLE=GET-IT Demo
+      - SERVICEPROVIDER_HOURS=
+      - SERVICEPROVIDER_NODENAME=GET-IT Demo
+      - SERVICEPROVIDER_NODEABSTRACT=Sensor Observation Service - Access of observations
+      - SERVICEPROVIDER_ADDRESS=Via Alfonso Corti 12
+      - SERVICEPROVIDER_EMAIL=infogetitsk@gmail.com
+      - SERVICEPROVIDER_STATEPROVINCE=MI
+      - SERVICEPROVIDER_NAME=IREA CNR
+      - SERVICEPROVIDER_POSTALCODE=20133
+      - SERVICEPROVIDER_PHONE=
+      - SERVICEPROVIDER_NODEKEYWORDS=
+      - SERVICEIDENTIFICATION_ABSTRACT_IT=Sensor Observation Service - Accesso alle osservazioni
+      - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
+      - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
+      - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
+      - MISC_DEFAULTOFFERINGPREFIX=offering:
+      - INSPIRE_METADATA_URL=
+      - INSPIRE_NAMESPACE=
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
+      - TRANSACTIONAL_ALLOWED_PROXIES=
+      - TRANSACTIONAL_ALLOWED_IPS=
+      - SOS_ADMIN_USERNAME=adminsos
+      
+
+  celery:
+    image: geobeyond/geonode:2.7.x
+    restart: unless-stopped
+    container_name: celery4${COMPOSE_PROJECT_NAME}
+    stdin_open: true
+    tty: true
+    labels:
+        org.geonode.component: celery
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+        io.rancher.container.pull_image: always
+    depends_on:
+      - db
+      - elasticsearch
+      - rabbitmq
+    command: celery worker --app=geosk.celery_app:app -B -l INFO
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - GEONODE_INSTANCE_NAME=starterkit
+      - GEONODE_LB_HOST_IP=155.253.20.48
+      - GEONODE_LB_PORT=80
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - DEFAULT_BACKEND_DATASTORE=datastore
+      - GEONODE_DATABASE=geonode
+      - GEONODE_DATABASE_PASSWORD=geonode
+      - GEONODE_GEODATABASE=geonode_data
+      - GEONODE_GEODATABASE_PASSWORD=geonode_data
+      - BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - DJANGO_SETTINGS_MODULE=geosk.settings
+      - ALLOWED_HOSTS=['django',]
+      - DOCKER_ENV=production
+      - CELERY_CMD=celery worker --app=geosk.celery_app:app -B -l INFO
+      - IS_CELERY=true
+      - C_FORCE_ROOT=1
+      - GEOSERVER_PUBLIC_LOCATION=http://geonode/geoserver/
+      - GEOSERVER_LOCATION=http://geonode/geoserver/
+      - SITEURL=http://geonode/
+      - SERVICEPROVIDER_COUNTRY=Italy
+      - SERVICEPROVIDER_STATE=MI
+      - SERVICEPROVIDER_SITE=http://www.irea.cnr.it
+      - SERVICEPROVIDER_INDIVIDUALNAME=IREA CNR
+      - SERVICEPROVIDER_CITY=Milan
+      - SERVICEPROVIDER_INSTRUCTIONS=
+      - SERVICEPROVIDER_POSITIONNAME=TBA
+      - SERVICEPROVIDER_FAX=
+      - SERVICEPROVIDER_NODETITLE=GET-IT Demo
+      - SERVICEPROVIDER_HOURS=
+      - SERVICEPROVIDER_NODENAME=GET-IT Demo
+      - SERVICEPROVIDER_NODEABSTRACT=Sensor Observation Service - Access of observations
+      - SERVICEPROVIDER_ADDRESS=Via Alfonso Corti 12
+      - SERVICEPROVIDER_EMAIL=infogetitsk@gmail.com
+      - SERVICEPROVIDER_STATEPROVINCE=MI
+      - SERVICEPROVIDER_NAME=IREA CNR
+      - SERVICEPROVIDER_POSTALCODE=20133
+      - SERVICEPROVIDER_PHONE=
+      - SERVICEPROVIDER_NODEKEYWORDS=
+      - SERVICEIDENTIFICATION_ABSTRACT_IT=Sensor Observation Service - Accesso alle osservazioni
+      - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
+      - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
+      - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
+      - MISC_DEFAULTOFFERINGPREFIX=offering:
+      - INSPIRE_METADATA_URL=
+      - INSPIRE_NAMESPACE=
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
+      - TRANSACTIONAL_ALLOWED_PROXIES=
+      - TRANSACTIONAL_ALLOWED_IPS=
+      - SOS_ADMIN_USERNAME=adminsos
+
+  geoserver:
+    image: geobeyond/geoserver:2.10.x
+    restart: unless-stopped
+    container_name: geoserver4${COMPOSE_PROJECT_NAME}
+    stdin_open: true
+    tty: true
+    labels:
+        org.geonode.component: geoserver
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+        io.rancher.container.pull_image: always
+    depends_on:
+      - db
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - geoserver-data-dir:/geoserver_data/data
+    environment:
+      - GEONODE_LB_HOST_IP=155.253.20.48
+      - GEONODE_LB_PORT=80
+      - DOCKERHOST
+      - PUBLIC_PORT=80
+      - DOCKER_HOST_IP
+
+  consumers:
+    image: geobeyond/geonode:2.7.x
+    restart: unless-stopped
+    container_name: consumers4${COMPOSE_PROJECT_NAME}
+    stdin_open: true
+    tty: true
+    labels:
+        org.geonode.component: consumers
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+        io.rancher.container.pull_image: always
+    depends_on:
+      - rabbitmq
+      - db
+      - elasticsearch
+    command: python manage.py runmessaging
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - GEONODE_INSTANCE_NAME=starterkit
+      - GEONODE_LB_HOST_IP=155.253.20.48
+      - GEONODE_LB_PORT=80
+      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - DEFAULT_BACKEND_DATASTORE=datastore
+      - GEONODE_DATABASE=geonode
+      - GEONODE_DATABASE_PASSWORD=geonode
+      - GEONODE_GEODATABASE=geonode_data
+      - GEONODE_GEODATABASE_PASSWORD=geonode_data
+      - BROKER_URL=amqp://guest:guest@rabbitmq:5672/
+      - DJANGO_SETTINGS_MODULE=geosk.settings
+      - ALLOWED_HOSTS=['django',]
+      - DOCKER_ENV=production
+      - UWSGI_CMD=uwsgi --ini /usr/src/app/uwsgi.ini
+      - IS_CELERY=false
+      - C_FORCE_ROOT=1
+      - GEOSERVER_PUBLIC_LOCATION=http://geonode/geoserver/
+      - GEOSERVER_LOCATION=http://geonode/geoserver/
+      - SOS_LOCATION=http://geonode/observations/sos
+      - SITEURL=http://geonode/
+      - VERSION_UBUNTU=16.04
+      - VERSION_JAVA=1.8
+      - VERSION_TOMCAT=9
+      - VERSION_SOS=4.4
+      - SERVICEPROVIDER_COUNTRY=Italy
+      - SERVICEPROVIDER_STATE=MI
+      - SERVICEPROVIDER_SITE=http://www.irea.cnr.it
+      - SERVICEPROVIDER_INDIVIDUALNAME=IREA CNR
+      - SERVICEPROVIDER_CITY=Milan
+      - SERVICEPROVIDER_INSTRUCTIONS=
+      - SERVICEPROVIDER_POSITIONNAME=TBA
+      - SERVICEPROVIDER_FAX=
+      - SERVICEPROVIDER_NODETITLE=GET-IT Demo
+      - SERVICEPROVIDER_HOURS=
+      - SERVICEPROVIDER_NODENAME=GET-IT Demo
+      - SERVICEPROVIDER_NODEABSTRACT=Sensor Observation Service - Access of observations
+      - SERVICEPROVIDER_ADDRESS=Via Alfonso Corti 12
+      - SERVICEPROVIDER_EMAIL=infogetitsk@gmail.com
+      - SERVICEPROVIDER_STATEPROVINCE=MI
+      - SERVICEPROVIDER_NAME=IREA CNR
+      - SERVICEPROVIDER_POSTALCODE=20133
+      - SERVICEPROVIDER_PHONE=
+      - SERVICEPROVIDER_NODEKEYWORDS=
+      - SERVICEIDENTIFICATION_ABSTRACT_IT=Sensor Observation Service - Accesso alle osservazioni
+      - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
+      - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
+      - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
+      - MISC_DEFAULTOFFERINGPREFIX=offering:
+      - INSPIRE_METADATA_URL=
+      - INSPIRE_NAMESPACE=
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
+      - TRANSACTIONAL_ALLOWED_PROXIES=
+      - TRANSACTIONAL_ALLOWED_IPS=
+      - SOS_ADMIN_USERNAME=adminsos
+
+  sos:
+    image: geobeyond/sos-configured:4.4.2
+    restart: unless-stopped
+    container_name: sos4${COMPOSE_PROJECT_NAME}
+    stdin_open: true
+    tty: true
+    labels:
+        org.geonode.component: sos
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+        io.rancher.container.pull_image: always
+    depends_on:
+      - dbsos
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    environment:
+      - SERVICEPROVIDER_COUNTRY=Italy
+      - SERVICEPROVIDER_STATE=MI
+      - SERVICEPROVIDER_SITE=http://www.irea.cnr.it
+      - SERVICEPROVIDER_INDIVIDUALNAME=IREA CNR
+      - SERVICEPROVIDER_CITY=Milan
+      - SERVICEPROVIDER_INSTRUCTIONS=
+      - SERVICEPROVIDER_POSITIONNAME=TBA
+      - SERVICEPROVIDER_FAX=
+      - SERVICEPROVIDER_NODETITLE=GET-IT Demo
+      - SERVICEPROVIDER_HOURS=
+      - SERVICEPROVIDER_NODENAME=GET-IT Demo
+      - SERVICEPROVIDER_NODEABSTRACT=Sensor Observation Service - Access of observations
+      - SERVICEPROVIDER_ADDRESS=Via Alfonso Corti 12
+      - SERVICEPROVIDER_EMAIL=infogetitsk@gmail.com
+      - SERVICEPROVIDER_STATEPROVINCE=MI
+      - SERVICEPROVIDER_NAME=IREA CNR
+      - SERVICEPROVIDER_POSTALCODE=20133
+      - SERVICEPROVIDER_PHONE=
+      - SERVICEPROVIDER_NODEKEYWORDS=
+      - SERVICEIDENTIFICATION_ABSTRACT_IT=Sensor Observation Service - Accesso alle osservazioni
+      - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
+      - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
+      - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
+      - MISC_DEFAULTOFFERINGPREFIX=offering:
+      - INSPIRE_METADATA_URL=
+      - INSPIRE_NAMESPACE=
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
+      - TRANSACTIONAL_ALLOWED_PROXIES=
+      - TRANSACTIONAL_ALLOWED_IPS=
+      - SOS_ADMIN_USERNAME=adminsos
+
+  geonode:
+    image: geobeyond/nginx:sos
+    restart: unless-stopped
+    container_name: nginx4${COMPOSE_PROJECT_NAME}
+    stdin_open: true
+    tty: true
+    labels:
+        org.geonode.component: nginx
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+    depends_on:
+      - django
+      - geoserver
+      - sos
+    ports:
+      - "80:80"
+
+  data-dir-conf:
+    image: geonode/geoserver_data:2.10.x
+    restart: on-failure
+    container_name: gsconf4${COMPOSE_PROJECT_NAME}
+    labels:
+        org.geonode.component: conf
+        org.geonode.instance.name: starterkit
+        io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
+        io.rancher.container.start_once: 'true'
+    command: /bin/true
+    volumes:
+      - geoserver-data-dir:/geoserver_data/data
+
+volumes:
+
+  geoserver-data-dir:
+    name: ${COMPOSE_PROJECT_NAME}-gsdatadir
+  dbdata:
+    name: ${COMPOSE_PROJECT_NAME}-dbdata
+  dbsosdata:
+    name: ${COMPOSE_PROJECT_NAME}-dbsosdata
+  dbbackups:
+    name: ${COMPOSE_PROJECT_NAME}-dbbackups
