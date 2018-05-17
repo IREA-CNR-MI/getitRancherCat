@@ -32,7 +32,7 @@ services:
         io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
     volumes:
       - dbsosdata:/dbsosdata
-    env_file:
+    environment:
       - SERVICEPROVIDER_COUNTRY=Italy
       - SERVICEPROVIDER_STATE=MI
       - SERVICEPROVIDER_SITE=http://www.irea.cnr.it
