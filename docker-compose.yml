@@ -254,6 +254,7 @@ services:
       - geoserver-data-dir:/geoserver_data/data
     environment:
       - GEONODE_LB_HOST_IP=155.253.20.48
+      - GEONODE_INSTANCE_NAME=starterkit
       - GEONODE_LB_PORT=80
       - DOCKERHOST
       - PUBLIC_PORT=80
@@ -350,6 +351,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
+      - GEONODE_INSTANCE_NAME=starterkit
       - SERVICEPROVIDER_COUNTRY=Italy
       - SERVICEPROVIDER_STATE=MI
       - SERVICEPROVIDER_SITE=http://www.irea.cnr.it
