@@ -56,7 +56,7 @@ services:
       - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
       - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
       - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
-      - MISC_DEFAULTOFFERINGPREFIX=offering:
+      - MISC_DEFAULTOFFERINGPREFIX="offering:"
       - INSPIRE_METADATA_URL=
       - INSPIRE_NAMESPACE=
       - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
