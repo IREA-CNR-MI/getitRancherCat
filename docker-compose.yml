@@ -105,7 +105,7 @@ services:
       - db
       - elasticsearch
       - rabbitmq
-    command: django-admin.py runserver 0.0.0.0:8000 --settings=geonode.settings
+    command: django-admin.py runserver 0.0.0.0:8000 --settings=geosk.settings
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
