@@ -91,7 +91,7 @@ services:
         io.rancher.scheduler.affinity:host_label: geonodehost=satfarm2
 
   django:
-    image: geobeyond/geonode:2.7.x
+    image: geobeyond/starterkit:2.7.x
     restart: unless-stopped
     container_name: django4${COMPOSE_PROJECT_NAME}
     stdin_open: true
@@ -167,7 +167,7 @@ services:
       
 
   celery:
-    image: geobeyond/geonode:2.7.x
+    image: geobeyond/starterkit:2.7.x
     restart: unless-stopped
     container_name: celery4${COMPOSE_PROJECT_NAME}
     stdin_open: true
@@ -261,7 +261,7 @@ services:
       - DOCKER_HOST_IP
 
   consumers:
-    image: geobeyond/geonode:2.7.x
+    image: geobeyond/starterkit:2.7.x
     restart: unless-stopped
     container_name: consumers4${COMPOSE_PROJECT_NAME}
     stdin_open: true
