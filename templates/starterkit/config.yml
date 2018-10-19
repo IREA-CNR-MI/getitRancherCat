@@ -1,0 +1,8 @@
+name: "Starterkit"
+description: |
+    Starterkit deployment
+version: "v1.0"
+category: "GIS"
+maintainer: "Geobeyond Srl"
+license: "GPL"
+projectURL: "https://github.com/geobeyond/starterkit"
