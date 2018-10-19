@@ -1,4 +1,4 @@
-${ALLOWED_HOSTS}version: "2"
+version: "2"
 services:
 
   db:
