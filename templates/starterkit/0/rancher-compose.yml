@@ -7,6 +7,26 @@ catalog:
     uuid: starterkit-0
     minimum_rancher_version: 'v1.6'
     questions:
+        -   variable: "STARTERKIT_LB_HOST_IP"
+            label: "IP address or hostname of the public URL for Starterkit"
+            description: |
+                The value filled here has to be the public IP address
+                or HOSTNAME where the users are going to navigate
+                the application. Example demo.get-it.com
+            required: true
+            type: string
+            default:
+
+        -   variable: "STARTERKIT_LB_PORT"
+            label: "Port of the public URL for Starterkit"
+            description: |
+                The value filled here has to be the port used
+                by HOSTNAME or IP address where the users are
+                going to navigate the application. Example 80
+            required: true
+            type: string
+            default: 80
+
         -   variable: "ALLOWED_HOSTS"
             label: "List of allowed host header values"
             description: |
