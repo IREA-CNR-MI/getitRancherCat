@@ -33,40 +33,9 @@ services:
     volumes:
       - dbsosdata:/dbsosdata
     environment:
-      - SERVICEPROVIDER_COUNTRY=Italy
-      - SERVICEPROVIDER_STATE=MI
-      - SERVICEPROVIDER_SITE=http://www.irea.cnr.it
-      - SERVICEPROVIDER_INDIVIDUALNAME=IREA CNR
-      - SERVICEPROVIDER_CITY=Milan
-      - SERVICEPROVIDER_INSTRUCTIONS=
-      - SERVICEPROVIDER_POSITIONNAME=TBA
-      - SERVICEPROVIDER_FAX=
-      - SERVICEPROVIDER_NODETITLE=GET-IT Demo
-      - SERVICEPROVIDER_HOURS=
-      - SERVICEPROVIDER_NODENAME=GET-IT Demo
-      - SERVICEPROVIDER_NODEABSTRACT=Sensor Observation Service - Access of observations
-      - SERVICEPROVIDER_ADDRESS=Via Alfonso Corti 12
-      - SERVICEPROVIDER_EMAIL=infogetitsk@gmail.com
-      - SERVICEPROVIDER_STATEPROVINCE=MI
-      - SERVICEPROVIDER_NAME=IREA CNR
-      - SERVICEPROVIDER_POSTALCODE=20133
-      - SERVICEPROVIDER_PHONE=
-      - SERVICEPROVIDER_NODEKEYWORDS=
-      - SERVICEIDENTIFICATION_ABSTRACT_IT=Sensor Observation Service - Accesso alle osservazioni
-      - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
-      - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
-      - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
-      - MISC_DEFAULTOFFERINGPREFIX="offering:"
-      - INSPIRE_METADATA_URL=
-      - INSPIRE_NAMESPACE=
-      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
-      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
-      - TRANSACTIONAL_ALLOWED_PROXIES=
-      - TRANSACTIONAL_ALLOWED_IPS=
-      - SOS_ADMIN_USERNAME=adminsos
-      #- SOS_ADMIN_PASSWORD=adminsos
-      - GEONODE_LB_HOST_IP=demo.getit.com
-      - GEONODE_LB_PORT=80
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=sos
 
   elasticsearch:
     image: elasticsearch
@@ -110,9 +79,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - GEONODE_INSTANCE_NAME=starterkit
-      - GEONODE_LB_HOST_IP=demo.getit.com
-      - GEONODE_LB_PORT=80
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - GEONODE_LB_HOST_IP=${STARTERKIT_LB_HOST_IP}
+      - GEONODE_LB_PORT=${STARTERKIT_LB_PORT}
+      - DATABASE_URL=postgres://geonode:geonode@db:5432/geonode
+      - GEODATABASE_URL=postgis://geonode:geonode@db:5432/geonode_data
       - DEFAULT_BACKEND_DATASTORE=datastore
       - GEONODE_DATABASE=geonode
       - GEONODE_DATABASE_PASSWORD=geonode
@@ -128,6 +98,8 @@ services:
       - GEOSERVER_PUBLIC_LOCATION=http://geonode/geoserver/
       - GEOSERVER_LOCATION=http://geonode/geoserver/
       - SOS_LOCATION=http://geonode/observations/sos
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
+      - TASTYPIE_APIKEY=pyxW5djJ7XsjeFUXduAsGpR4xMGUwpeBGQRqTeT3
       - SITEURL=http://geonode/
       - VERSION_UBUNTU=16.04
       - VERSION_JAVA=1.8
@@ -150,14 +122,14 @@ services:
       - SERVICEPROVIDER_STATEPROVINCE=MI
       - SERVICEPROVIDER_NAME=IREA CNR
       - SERVICEPROVIDER_POSTALCODE=20133
-      - SERVICEPROVIDER_PHONE=
+      - SERVICEPROVIDER_PHONE=+3902000000
       - SERVICEPROVIDER_NODEKEYWORDS=
       - SERVICEIDENTIFICATION_ABSTRACT_IT=Sensor Observation Service - Accesso alle osservazioni
       - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
       - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
       - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
       - MISC_DEFAULTOFFERINGPREFIX="offering:"
-      - INSPIRE_METADATA_URL=
+      - INSPIRE_METADATA_URL=http://www.get-it.it
       - INSPIRE_NAMESPACE=
       - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
       - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
@@ -186,9 +158,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - GEONODE_INSTANCE_NAME=starterkit
-      - GEONODE_LB_HOST_IP=demo.getit.com
-      - GEONODE_LB_PORT=80
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - GEONODE_LB_HOST_IP=${STARTERKIT_LB_HOST_IP}
+      - GEONODE_LB_PORT=${STARTERKIT_LB_PORT}
+      - DATABASE_URL=postgres://geonode:geonode@db:5432/geonode
+      - GEODATABASE_URL=postgis://geonode:geonode@db:5432/geonode_data
       - DEFAULT_BACKEND_DATASTORE=datastore
       - GEONODE_DATABASE=geonode
       - GEONODE_DATABASE_PASSWORD=geonode
@@ -203,6 +176,9 @@ services:
       - C_FORCE_ROOT=1
       - GEOSERVER_PUBLIC_LOCATION=http://geonode/geoserver/
       - GEOSERVER_LOCATION=http://geonode/geoserver/
+      - SOS_LOCATION=http://geonode/observations/sos
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
+      - TASTYPIE_APIKEY=pyxW5djJ7XsjeFUXduAsGpR4xMGUwpeBGQRqTeT3
       - SITEURL=http://geonode/
       - SERVICEPROVIDER_COUNTRY=Italy
       - SERVICEPROVIDER_STATE=MI
@@ -221,14 +197,14 @@ services:
       - SERVICEPROVIDER_STATEPROVINCE=MI
       - SERVICEPROVIDER_NAME=IREA CNR
       - SERVICEPROVIDER_POSTALCODE=20133
-      - SERVICEPROVIDER_PHONE=
+      - SERVICEPROVIDER_PHONE=+3902000000
       - SERVICEPROVIDER_NODEKEYWORDS=
       - SERVICEIDENTIFICATION_ABSTRACT_IT=Sensor Observation Service - Accesso alle osservazioni
       - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
       - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
       - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
       - MISC_DEFAULTOFFERINGPREFIX="offering:"
-      - INSPIRE_METADATA_URL=
+      - INSPIRE_METADATA_URL=http://www.get-it.it
       - INSPIRE_NAMESPACE=
       - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
       - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
@@ -237,7 +213,7 @@ services:
       - SOS_ADMIN_USERNAME=adminsos
 
   geoserver:
-    image: geobeyond/geoserver:2.10.x
+    image: geobeyond/geoserver:2.12.x-monit
     restart: unless-stopped
     container_name: geoserver4${COMPOSE_PROJECT_NAME}
     stdin_open: true
@@ -254,11 +230,12 @@ services:
       - geoserver-data-dir:/geoserver_data/data
     environment:
       - GEONODE_INSTANCE_NAME=starterkit
-      - GEONODE_LB_HOST_IP=demo.getit.com
-      - GEONODE_LB_PORT=80
+      - GEONODE_LB_HOST_IP=${STARTERKIT_LB_HOST_IP}
+      - GEONODE_LB_PORT=${STARTERKIT_LB_PORT}
       - DOCKERHOST
       - PUBLIC_PORT=80
       - DOCKER_HOST_IP
+      - GEOSERVER_JAVA_OPTS=-Djava.awt.headless=true -XX:MaxPermSize=512m -XX:PermSize=256m -Xms512m -Xmx4096m -XX:+UseConcMarkSweepGC -XX:+UseParNewGC -XX:ParallelGCThreads=4 -Dfile.encoding=UTF8 -Duser.timezone=GMT -Djavax.servlet.request.encoding=UTF-8 -Djavax.servlet.response.encoding=UTF-8 -Duser.timezone=GMT -Dorg.geotools.shapefile.datetime=true
 
   consumers:
     image: geobeyond/starterkit:2.7.x
@@ -280,9 +257,10 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - GEONODE_INSTANCE_NAME=starterkit
-      - GEONODE_LB_HOST_IP=demo.getit.com
-      - GEONODE_LB_PORT=80
-      - DATABASE_URL=postgres://postgres:postgres@db:5432/postgres
+      - GEONODE_LB_HOST_IP=${STARTERKIT_LB_HOST_IP}
+      - GEONODE_LB_PORT=${STARTERKIT_LB_PORT}
+      - DATABASE_URL=postgres://geonode:geonode@db:5432/geonode
+      - GEODATABASE_URL=postgis://geonode:geonode@db:5432/geonode_data
       - DEFAULT_BACKEND_DATASTORE=datastore
       - GEONODE_DATABASE=geonode
       - GEONODE_DATABASE_PASSWORD=geonode
@@ -298,6 +276,8 @@ services:
       - GEOSERVER_PUBLIC_LOCATION=http://geonode/geoserver/
       - GEOSERVER_LOCATION=http://geonode/geoserver/
       - SOS_LOCATION=http://geonode/observations/sos
+      - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
+      - TASTYPIE_APIKEY=pyxW5djJ7XsjeFUXduAsGpR4xMGUwpeBGQRqTeT3
       - SITEURL=http://geonode/
       - VERSION_UBUNTU=16.04
       - VERSION_JAVA=1.8
@@ -320,14 +300,14 @@ services:
       - SERVICEPROVIDER_STATEPROVINCE=MI
       - SERVICEPROVIDER_NAME=IREA CNR
       - SERVICEPROVIDER_POSTALCODE=20133
-      - SERVICEPROVIDER_PHONE=
+      - SERVICEPROVIDER_PHONE=+3902000000
       - SERVICEPROVIDER_NODEKEYWORDS=
       - SERVICEIDENTIFICATION_ABSTRACT_IT=Sensor Observation Service - Accesso alle osservazioni
       - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
       - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
       - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
       - MISC_DEFAULTOFFERINGPREFIX="offering:"
-      - INSPIRE_METADATA_URL=
+      - INSPIRE_METADATA_URL=http://www.get-it.it
       - INSPIRE_NAMESPACE=
       - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
       - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
@@ -352,8 +332,8 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
     environment:
       - GEONODE_INSTANCE_NAME=starterkit
-      - GEONODE_LB_HOST_IP=demo.getit.com
-      - GEONODE_LB_PORT=80
+      - GEONODE_LB_HOST_IP=${STARTERKIT_LB_HOST_IP}
+      - GEONODE_LB_PORT=${STARTERKIT_LB_PORT}
       - SERVICEPROVIDER_COUNTRY=Italy
       - SERVICEPROVIDER_STATE=MI
       - SERVICEPROVIDER_SITE=http://www.irea.cnr.it
@@ -371,14 +351,14 @@ services:
       - SERVICEPROVIDER_STATEPROVINCE=MI
       - SERVICEPROVIDER_NAME=IREA CNR
       - SERVICEPROVIDER_POSTALCODE=20133
-      - SERVICEPROVIDER_PHONE=
+      - SERVICEPROVIDER_PHONE=+3902000000
       - SERVICEPROVIDER_NODEKEYWORDS=
       - SERVICEIDENTIFICATION_ABSTRACT_IT=Sensor Observation Service - Accesso alle osservazioni
       - SERVICEIDENTIFICATION_ABSTRACT_EN=Sensor Observation Service - Access of observations
       - SERVICEIDENTIFICATION_TITLE_IT=SOS Sensor Observation Service - Accesso alle osservazioni
       - SERVICEIDENTIFICATION_TITLE_EN=SOS Sensor Observation Service - Access of observations
       - MISC_DEFAULTOFFERINGPREFIX="offering:"
-      - INSPIRE_METADATA_URL=
+      - INSPIRE_METADATA_URL=http://www.get-it.it
       - INSPIRE_NAMESPACE=
       - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN_ACTIVE=1
       - SOS_TRANSACTIONAL_AUTHORIZATION_TOKEN=862f95da7f578881aebf6c2722fe4840
@@ -404,7 +384,7 @@ services:
       - "80:80"
 
   data-dir-conf:
-    image: geonode/geoserver_data:2.10.x
+    image: geonode/geoserver_data:2.12.x
     restart: on-failure
     container_name: gsconf4${COMPOSE_PROJECT_NAME}
     labels:
