@@ -220,7 +220,7 @@ services:
     # tty: true
     labels:
         org.geonode.component: cron
-        org.geonode.instance.name: geonode
+        org.geonode.instance.name: starterkit
     depends_on:
       - db
       - geonode
